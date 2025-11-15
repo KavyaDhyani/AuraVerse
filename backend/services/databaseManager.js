@@ -397,6 +397,63 @@ async function queryMongoDB(collectionName, limit = 100) {
   return docs;
 }
 
+/**
+ * Delete table from PostgreSQL
+ */
+async function deleteFromPostgreSQL(tableName) {
+  if (!pgPool) {
+    throw new Error('PostgreSQL not configured');
+  }
+
+  try {
+    await pgPool.query(`DROP TABLE IF EXISTS ${tableName} CASCADE`);
+    console.log(`  ✅ Dropped table from PostgreSQL: ${tableName}`);
+    return true;
+  } catch (error) {
+    console.error('PostgreSQL delete error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete collection from MongoDB
+ */
+async function deleteFromMongoDB(collectionName) {
+  if (!mongoDb) {
+    throw new Error('MongoDB not configured');
+  }
+
+  try {
+    const collection = mongoDb.collection(collectionName);
+    await collection.drop();
+    console.log(`  ✅ Dropped collection from MongoDB: ${collectionName}`);
+    return true;
+  } catch (error) {
+    // If collection doesn't exist, don't throw error
+    if (error.message.includes('ns not found')) {
+      console.log(`  ⚠️  Collection not found (already deleted): ${collectionName}`);
+      return true;
+    }
+    console.error('MongoDB delete error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete data from appropriate database
+ * @param {string} dbType - 'PostgreSQL' or 'MongoDB'
+ * @param {string} tableName - Name of table/collection
+ */
+async function deleteFromDatabase(dbType, tableName) {
+  if (dbType === 'PostgreSQL') {
+    return await deleteFromPostgreSQL(tableName);
+  } else if (dbType === 'MongoDB') {
+    return await deleteFromMongoDB(tableName);
+  } else {
+    throw new Error(`Unknown database type: ${dbType}`);
+  }
+}
+
 // Cleanup on exit
 process.on('SIGINT', async () => {
   if (pgPool) {
@@ -413,5 +470,8 @@ module.exports = {
   storeInPostgreSQL,
   storeInMongoDB,
   queryPostgreSQL,
-  queryMongoDB
+  queryMongoDB,
+  deleteFromDatabase,
+  deleteFromPostgreSQL,
+  deleteFromMongoDB
 };

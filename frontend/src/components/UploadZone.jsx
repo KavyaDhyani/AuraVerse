@@ -34,7 +34,7 @@ const UploadZone = () => {
       
       console.log('✅ Media upload response:', result);
       showNotification(
-        `Successfully uploaded ${result.count} media file(s)! Processing in background...`,
+        `Successfully uploaded ${result.count} media file(s)! Categorizing and storing...`,
         'success'
       );
 
@@ -95,7 +95,7 @@ const UploadZone = () => {
       
       console.log('✅ JSON upload response:', result);
       showNotification(
-        `Successfully uploaded ${result.count} JSON file(s)! Analyzing schema...`,
+        `Successfully uploaded ${result.count} JSON file(s)! Analyzing and storing...`,
         'success'
       );
 
@@ -222,7 +222,7 @@ const UploadZone = () => {
           <div className="flex items-center gap-3">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-400"></div>
             <span className="text-purple-300 text-sm">
-              Uploading to backend... Files are being processed by AI.
+              Uploading to backend... Files are being processed.
             </span>
           </div>
         </div>
